@@ -18,6 +18,9 @@ class _WeatherPageState extends State<WeatherPage> {
   final _weatherService = WeatherService('57da4770d9a469363b7ea371e6603933');
   Weather? _weather;
 
+  // Track whether the data has been loaded
+  bool _dataLoaded = false;
+
   // fetch weather
   _fetchWeather() async {
     // get the current city
@@ -28,6 +31,7 @@ class _WeatherPageState extends State<WeatherPage> {
       final weather = await _weatherService.getWeather(cityName);
       setState(() {
         _weather = weather;
+        _dataLoaded = true; // Set to true when data is loaded
       });
     }
     // errors
@@ -38,29 +42,12 @@ class _WeatherPageState extends State<WeatherPage> {
     }
   }
 
-  final bool _dataLoaded = false; // Track whether the data has been loaded
-
-  Text _buildTemperatureText() {
-    String temperatureText = _weather?.temperature != null
-        ? '${_weather?.temperature.round()} °C'
-        : 'Trying to get your city temperature too..';
-
-    return Text(
-      temperatureText,
-      style: GoogleFonts.poppins(
-        fontSize: _dataLoaded ? 80 : 17, // Dynamic font size
-        fontWeight: FontWeight.w500,
-      ),
-      textAlign: TextAlign.center,
-    );
-  }
-
-//weather animations
+  // weather animations
   String getWeatherAnimation(String? mainCondition) {
     if (mainCondition == null) {
       return 'assets/earth.json'; // default to the default weather animation
     }
-//The switch statements to help switch to supposed animations for us.
+    // The switch statements to help switch to supposed animations for us.
     switch (mainCondition.toLowerCase()) {
       case 'clouds':
         return 'assets/cloud.json';
@@ -85,12 +72,28 @@ class _WeatherPageState extends State<WeatherPage> {
     }
   }
 
-// init state
+  // build temperature text
+  Text _buildTemperatureText() {
+    String temperatureText = _weather?.temperature != null
+        ? '${_weather?.temperature.round()} °C'
+        : 'Trying to get your city temperature too..';
+
+    return Text(
+      temperatureText,
+      style: GoogleFonts.bebasNeue(
+        fontSize: _dataLoaded ? 80 : 17, // Dynamic font size
+        fontWeight: FontWeight.w500,
+      ),
+      textAlign: TextAlign.center,
+    );
+  }
+
+  // init state
   @override
   void initState() {
     super.initState();
 
-    //fetch weather on startup
+    // fetch weather on startup
     _fetchWeather();
   }
 
@@ -115,7 +118,7 @@ class _WeatherPageState extends State<WeatherPage> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 const Spacer(),
-                //city name
+                // city name
                 Text(
                   _weather?.cityName ?? 'Loading your city name and',
                   style: GoogleFonts.poppins(
@@ -125,8 +128,8 @@ class _WeatherPageState extends State<WeatherPage> {
                   ),
                 ),
 
-                //temperature
-                _buildTemperatureText(), // Use the new method
+                // temperature
+                _buildTemperatureText(), // Using this method
 
                 // weather condition
                 Text(
@@ -137,7 +140,7 @@ class _WeatherPageState extends State<WeatherPage> {
                   ),
                 ),
 
-                //weather animation
+                // weather animation
                 Lottie.asset(
                   getWeatherAnimation(
                     _weather?.mainCondition,
