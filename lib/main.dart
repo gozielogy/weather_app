@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:talk_podcast/view/home_screen.dart';
+import 'package:flutter_weather_app/view/home_screen.dart';
 
 void main() {
   runApp(const EasyWeather());
