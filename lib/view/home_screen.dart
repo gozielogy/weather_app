@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:lottie/lottie.dart';
+
 import '../model/weather_model.dart';
 import '../services/weather_services.dart';
 
@@ -42,33 +43,37 @@ class _WeatherPageState extends State<WeatherPage> {
   Text _buildTemperatureText() {
     String temperatureText = _weather?.temperature != null
         ? '${_weather?.temperature.round()} °C'
-        : 'Loading temperature...';
+        : 'Trying to get your city temperature too..';
 
     return Text(
       temperatureText,
-      style: GoogleFonts.bebasNeue(
-        fontSize: _dataLoaded ? 80 : 20, // Dynamic font size
+      style: GoogleFonts.poppins(
+        fontSize: _dataLoaded ? 80 : 17, // Dynamic font size
         fontWeight: FontWeight.w500,
       ),
+      textAlign: TextAlign.center,
     );
   }
 
 //weather animations
   String getWeatherAnimation(String? mainCondition) {
     if (mainCondition == null) {
-      return 'assets/default.json'; // default to the default weather animation
+      return 'assets/earth.json'; // default to the default weather animation
     }
 //The switch statements to help switch to supposed animations for us.
     switch (mainCondition.toLowerCase()) {
       case 'clouds':
+        return 'assets/cloud.json';
       case 'mist':
       case 'smoke':
       case 'haze':
       case 'dust':
       case 'fog':
-        return 'assets/rain.json';
+        return 'assets/cloud.json';
       case 'rain':
+        return 'assets/rain.json';
       case 'drizzle':
+        return 'assets/newdefault.json';
       case 'shower rain':
         return 'assets/raining.json';
       case 'thunderstorm':
@@ -76,7 +81,7 @@ class _WeatherPageState extends State<WeatherPage> {
       case 'clear':
         return 'assets/sunny.json';
       default:
-        return 'assets/sunny.json';
+        return 'assets/earth.json';
     }
   }
 
@@ -93,28 +98,36 @@ class _WeatherPageState extends State<WeatherPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.black,
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        actions: [
+          Lottie.asset(
+            'assets/profile.json',
+          ),
+        ],
+      ),
       body: SafeArea(
-        child: RefreshIndicator(
-          onRefresh: () async {
-            await _fetchWeather();
-          },
-          child: Center(
+        child: Center(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20.0),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 const Spacer(),
                 //city name
                 Text(
-                  _weather?.cityName ?? 'Loading city...',
+                  _weather?.cityName ?? 'Loading your city name and',
                   style: GoogleFonts.poppins(
                     fontSize: 20,
                     fontWeight: FontWeight.w500,
                     color: Colors.yellow,
                   ),
                 ),
-                //temperature
+
                 //temperature
                 _buildTemperatureText(), // Use the new method
+
                 // weather condition
                 Text(
                   _weather?.mainCondition ?? "",
@@ -124,14 +137,6 @@ class _WeatherPageState extends State<WeatherPage> {
                   ),
                 ),
 
-                //weather condition
-                Text(
-                  _weather?.mainCondition ?? "",
-                  style: GoogleFonts.poppins(
-                    fontSize: 30,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
                 //weather animation
                 Lottie.asset(
                   getWeatherAnimation(
